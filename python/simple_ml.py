@@ -1,10 +1,6 @@
 import struct
 import numpy as np
 import gzip
-try:
-    from simple_ml_ext import *
-except:
-    pass
 
 
 def add(x, y):
@@ -17,9 +13,7 @@ def add(x, y):
     Return:
         Sum of x + y
     """
-    ### BEGIN YOUR CODE
     return x+y
-    ### END YOUR CODE
 
 
 def parse_mnist(image_filename, label_filename):
@@ -42,16 +36,15 @@ def parse_mnist(image_filename, label_filename):
                 labels of the examples.  Values should be of type np.uint8 and
                 for MNIST will contain the values 0-9.
     """
-    ### BEGIN YOUR CODE
     def readLabels(filePath=label_filename):
         with gzip.open(filePath, 'rb') as f:
-            return [struct.unpack('>II', f.read(8)),np.frombuffer(f.read(),dtype=np.uint8)]
+            return [struct.unpack('>II', f.read(8)), np.frombuffer(f.read(), dtype=np.uint8)]
+
     def readImages(filePath=image_filename):
         with gzip.open(filePath, 'rb') as f:
-            [magic,images,rows,cols]=struct.unpack('>IIII', f.read(16))
-            return np.resize(np.frombuffer(f.read(),dtype=np.uint8),(images,rows*cols))/np.float32(255)
-    return (readImages(),readLabels()[1])
-    ### END YOUR CODE
+            [magic, images, rows, cols] = struct.unpack('>IIII', f.read(16))
+            return np.resize(np.frombuffer(f.read(), dtype=np.uint8), (images, rows*cols))/np.float32(255)
+    return (readImages(), readLabels()[1])
 
 
 def softmax_loss(Z, y):
@@ -67,12 +60,10 @@ def softmax_loss(Z, y):
     Returns:
         Average softmax loss over the sample.
     """
-    ### BEGIN YOUR CODE
-    return np.average([*map(lambda idx:np.log(np.sum(np.exp(Z[idx])))-Z[idx][y[idx]],[x for x in range(len(y))])])
-    ### END YOUR CODE
+    return np.average([*map(lambda idx:np.log(np.sum(np.exp(Z[idx])))-Z[idx][y[idx]], [x for x in range(len(y))])])
 
 
-def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
+def softmax_regression_epoch(X, y, theta, lr=0.1, batch=100):
     """ Run a single epoch of SGD for softmax regression on the data, using
     the step size lr and specified batch size.  This function should modify the
     theta matrix in place, and you should iterate through batches in X _without_
@@ -88,22 +79,20 @@ def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
     Returns:
         None
     """
-    ### BEGIN YOUR CODE
     def normalize(cur):
-        def calCuri(curi): 
+        def calCuri(curi):
             return np.exp(curi)/np.sum(np.exp(cur))
-        return [*map(calCuri,cur)]
-    for index in range(0,len(y),batch):
-        batchX,batchy=X[index:index+batch],y[index:index+batch]
-        Z=np.array([*map(normalize,np.dot(batchX,theta))])
-        newy=np.array([np.concatenate((x[0:yy],np.array([1]),x[yy+1:]), axis=0) 
-          for (x,yy) in zip(np.zeros(shape=(batchy.shape[0],theta[0].shape[0])),batchy)
-         ])
-        theta-=(lr/batch)*np.dot(batchX.transpose(),(Z-newy))
-    ### END YOUR CODE
+        return [*map(calCuri, cur)]
+    for index in range(0, len(y), batch):
+        batchX, batchy = X[index:index+batch], y[index:index+batch]
+        Z = np.array([*map(normalize, np.dot(batchX, theta))])
+        newy = np.array([np.concatenate((x[0:yy], np.array([1]), x[yy+1:]), axis=0)
+                         for (x, yy) in zip(np.zeros(shape=(batchy.shape[0], theta[0].shape[0])), batchy)
+                         ])
+        theta -= (lr/batch)*np.dot(batchX.transpose(), (Z-newy))
 
 
-def nn_epoch(X, y, W1, W2, lr = 0.1, batch=100):
+def nn_epoch(X, y, W1, W2, lr=0.1, batch=100):
     """ Run a single epoch of SGD for a two-layer neural network defined by the
     weights W1 and W2 (with no bias terms):
         logits = ReLU(X * W1) * W2
@@ -123,86 +112,81 @@ def nn_epoch(X, y, W1, W2, lr = 0.1, batch=100):
     Returns:
         None
     """
-    ### BEGIN YOUR CODE
-#     def RELU(x):
-#         def relu(x):
-#             return max(0,x)
-#         return np.array(np.frompyfunc(relu,1,1)(x),dtype=np.float32)
-#     def normalize(cur):
-#         def calCuri(curi): 
-#             return np.exp(curi)/np.sum(np.exp(cur))
-#         return np.apply_along_axis(calCuri,0,cur)
-#     def NOTZERO(x):
-#         def isZero(x):
-#             return 1 if x>0 else 0
-#         return np.array(np.frompyfunc(isZero,1,1)(x),dtype=np.float32)
-#     for index in range(0,len(y),batch):
-#         batchX,batchy=X[index:index+batch],y[index:index+batch]
-#         Iy=np.array([np.concatenate((x[0:yy],np.array([1]),x[yy+1:]), axis=0) 
-#           for (x,yy) in zip(np.zeros(shape=(batchy.shape[0],W2.shape[1])),batchy)
-#          ])
-#         Z1=RELU(np.dot(batchX,W1))
-#         G2=np.apply_along_axis(normalize,1,np.dot(Z1,W2))-Iy
-#         G1=np.multiply(NOTZERO(Z1),(np.dot(G2,W2.transpose())))
-#         W1-=(lr/batch)*np.dot(batchX.transpose(),G1)
-#         W2-=(lr/batch)*np.dot(Z1.transpose(),G2)
+    # def RELU(x):
+    #     def relu(x):
+    #         return max(0,x)
+    #     return np.array(np.frompyfunc(relu,1,1)(x),dtype=np.float32)
+    # def normalize(cur):
+    #     def calCuri(curi):
+    #         return np.exp(curi)/np.sum(np.exp(cur))
+    #     return np.apply_along_axis(calCuri,0,cur)
+    # def NOTZERO(x):
+    #     def isZero(x):
+    #         return 1 if x>0 else 0
+    #     return np.array(np.frompyfunc(isZero,1,1)(x),dtype=np.float32)
+    # for index in range(0,len(y),batch):
+    #     batchX,batchy=X[index:index+batch],y[index:index+batch]
+    #     Iy=np.array([np.concatenate((x[0:yy],np.array([1]),x[yy+1:]), axis=0)
+    #       for (x,yy) in zip(np.zeros(shape=(batchy.shape[0],W2.shape[1])),batchy)
+    #      ])
+    #     Z1=RELU(np.dot(batchX,W1))
+    #     G2=np.apply_along_axis(normalize,1,np.dot(Z1,W2))-Iy
+    #     G1=np.multiply(NOTZERO(Z1),(np.dot(G2,W2.transpose())))
+    #     W1-=(lr/batch)*np.dot(batchX.transpose(),G1)
+    #     W2-=(lr/batch)*np.dot(Z1.transpose(),G2)
+
     def RELU(arr):
         return np.maximum(0, arr)
+
     def softmax_columns(arr):
         return np.exp(arr) / np.sum(np.exp(arr), axis=1, keepdims=True)
-    for index in range(0,len(y),batch):
-        batchX,batchy=X[index:index+batch],y[index:index+batch]
-        Iy=np.array([np.concatenate((x[0:yy],np.array([1]),x[yy+1:]), axis=0) 
-          for (x,yy) in zip(np.zeros(shape=(batchy.shape[0],W2.shape[1])),batchy)
-         ])
-        Z1=RELU(np.dot(batchX,W1))
-        G2=softmax_columns(np.dot(Z1,W2))-Iy
-        G1=np.multiply(np.where(Z1 > 0, 1, 0),(np.dot(G2,W2.transpose())))
-        W1-=(lr/batch)*np.dot(batchX.transpose(),G1)
-        W2-=(lr/batch)*np.dot(Z1.transpose(),G2)
-    ### END YOUR CODE
+    for index in range(0, len(y), batch):
+        batchX, batchy = X[index:index+batch], y[index:index+batch]
+        Iy = np.array([np.concatenate((x[0:yy], np.array([1]), x[yy+1:]), axis=0)
+                       for (x, yy) in zip(np.zeros(shape=(batchy.shape[0], W2.shape[1])), batchy)
+                       ])
+        Z1 = RELU(np.dot(batchX, W1))
+        G2 = softmax_columns(np.dot(Z1, W2))-Iy
+        G1 = np.multiply(np.where(Z1 > 0, 1, 0), (np.dot(G2, W2.transpose())))
+        W1 -= (lr/batch)*np.dot(batchX.transpose(), G1)
+        W2 -= (lr/batch)*np.dot(Z1.transpose(), G2)
 
 
+# CODE BELOW IS FOR ILLUSTRATION
 
-### CODE BELOW IS FOR ILLUSTRATION, YOU DO NOT NEED TO EDIT
-
-def loss_err(h,y):
+def loss_err(h, y):
     """ Helper funciton to compute both loss and error"""
-    return softmax_loss(h,y), np.mean(h.argmax(axis=1) != y)
+    return softmax_loss(h, y), np.mean(h.argmax(axis=1) != y)
 
 
-def train_softmax(X_tr, y_tr, X_te, y_te, epochs=10, lr=0.5, batch=100,
-                  cpp=False):
+def train_softmax(X_tr, y_tr, X_te, y_te, epochs=10, lr=0.5, batch=100):
     """ Example function to fully train a softmax regression classifier """
     theta = np.zeros((X_tr.shape[1], y_tr.max()+1), dtype=np.float32)
     print("| Epoch | Train Loss | Train Err | Test Loss | Test Err |")
     for epoch in range(epochs):
-        if not cpp:
-            softmax_regression_epoch(X_tr, y_tr, theta, lr=lr, batch=batch)
-        else:
-            softmax_regression_epoch_cpp(X_tr, y_tr, theta, lr=lr, batch=batch)
+        softmax_regression_epoch(X_tr, y_tr, theta, lr=lr, batch=batch)
         train_loss, train_err = loss_err(X_tr @ theta, y_tr)
         test_loss, test_err = loss_err(X_te @ theta, y_te)
-        print("|  {:>4} |    {:.5f} |   {:.5f} |   {:.5f} |  {:.5f} |"\
+        print("|  {:>4} |    {:.5f} |   {:.5f} |   {:.5f} |  {:.5f} |"
               .format(epoch, train_loss, train_err, test_loss, test_err))
 
 
-def train_nn(X_tr, y_tr, X_te, y_te, hidden_dim = 500,
+def train_nn(X_tr, y_tr, X_te, y_te, hidden_dim=500,
              epochs=10, lr=0.5, batch=100):
     """ Example function to train two layer neural network """
     n, k = X_tr.shape[1], y_tr.max() + 1
     np.random.seed(0)
-    W1 = np.random.randn(n, hidden_dim).astype(np.float32) / np.sqrt(hidden_dim)
+    W1 = np.random.randn(n, hidden_dim).astype(
+        np.float32) / np.sqrt(hidden_dim)
     W2 = np.random.randn(hidden_dim, k).astype(np.float32) / np.sqrt(k)
 
     print("| Epoch | Train Loss | Train Err | Test Loss | Test Err |")
     for epoch in range(epochs):
         nn_epoch(X_tr, y_tr, W1, W2, lr=lr, batch=batch)
-        train_loss, train_err = loss_err(np.maximum(X_tr@W1,0)@W2, y_tr)
-        test_loss, test_err = loss_err(np.maximum(X_te@W1,0)@W2, y_te)
-        print("|  {:>4} |    {:.5f} |   {:.5f} |   {:.5f} |  {:.5f} |"\
+        train_loss, train_err = loss_err(np.maximum(X_tr@W1, 0)@W2, y_tr)
+        test_loss, test_err = loss_err(np.maximum(X_te@W1, 0)@W2, y_te)
+        print("|  {:>4} |    {:.5f} |   {:.5f} |   {:.5f} |  {:.5f} |"
               .format(epoch, train_loss, train_err, test_loss, test_err))
-
 
 
 if __name__ == "__main__":
@@ -212,7 +196,7 @@ if __name__ == "__main__":
                              "data/t10k-labels-idx1-ubyte.gz")
 
     print("Training softmax regression")
-    train_softmax(X_tr, y_tr, X_te, y_te, epochs=10, lr = 0.1)
+    train_softmax(X_tr, y_tr, X_te, y_te, epochs=10, lr=0.1)
 
     print("\nTraining two layer neural network w/ 100 hidden units")
-    train_nn(X_tr, y_tr, X_te, y_te, hidden_dim=100, epochs=20, lr = 0.2)
+    train_nn(X_tr, y_tr, X_te, y_te, hidden_dim=100, epochs=20, lr=0.2)
