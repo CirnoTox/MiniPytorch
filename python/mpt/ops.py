@@ -134,7 +134,10 @@ class PowerScalar(TensorOp):
         return a**self.scalar
 
     def gradient(self, out_grad, node):
-        return out_grad*self.scalar*power_scalar(node.inputs[0], self.scalar-1)
+        gra=out_grad*self.scalar
+        par=power_scalar(node.inputs[0], self.scalar-1)
+        res=gra.numpy()*par.numpy()
+        return Tensor(res)
 
 
 def power_scalar(a, scalar):
@@ -243,9 +246,9 @@ class Summation(TensorOp):
 
     def compute(self, a):
         if self.axes is None:
-            return a.sum(axis=self.axes)
+            return a.sum(self.axes)
         if type(self.axes) is int:
-            return a.sum(axis=self.axes)
+            return a.sum(self.axes)
 
         newshape = []
         for i in range(len(a.shape)):
@@ -255,8 +258,8 @@ class Summation(TensorOp):
 
         itasum = a
         for i in range(len(self.axes)):
-            itasum = itasum.sum(axis=self.axes[i], keepdims=True)
-        return itasum.reshape(newshape)
+            itasum = itasum.sum(self.axes[i], keepdims=True)
+        return itasum if len(newshape) is 0 else itasum.reshape(newshape)
 
     def gradient(self, out_grad, node):
         # https://github.com/hnyoumfk/dlsyshw/blob/057e7a9e9c9497d8a2f576ef734b5fd4347cdf5f/hw1/python/needle/ops.py#L207
@@ -354,8 +357,9 @@ class LogSumExp(TensorOp):
 
     def compute(self, Z):
         # BEGIN YOUR SOLUTION
-        # https://github.com/bettersemut/dlsys_hw2/blob/8b16e4ecac6cf5d5efb2c4840f9107cdfe64e00b/python/needle/ops.py#L351
         def mymax(a, axes, keepdims):
+            if (self.axes is None) or (type(self.axes) is int):
+                return a.max(axes,keepdims=keepdims)
             newshape = []
             for i in range(len(a.shape)):
                 if i in axes:
@@ -364,10 +368,10 @@ class LogSumExp(TensorOp):
 
             itasum = a
             for i in range(len(axes)):
-                itasum = itasum.max(axis=axes[i], keepdims=True)
+                itasum = itasum.max(axes[i], keepdims=True)
             return itasum if keepdims else itasum.reshape(newshape)
-        maxz = Z.max(axis=self.axes)
-        maxz_keepDims = Z.max(axis=self.axes, keepdims=True)
+        maxz = mymax(Z,self.axes,False)
+        maxz_keepDims = mymax(Z,self.axes,True)
         maxz_keepDims = array_api.broadcast_to(maxz_keepDims, Z.shape)
         computeInput = Tensor(Z)
         minu = computeInput+Tensor(-maxz_keepDims)
@@ -377,7 +381,7 @@ class LogSumExp(TensorOp):
         result = logSummaExpMinus+Tensor(maxz)
         self.cache_input = computeInput
         self.cache_result = result
-        return result
+        return result.cached_data
 
     def gradient(self, out_grad, node):
         # BEGIN YOUR SOLUTION

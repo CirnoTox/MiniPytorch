@@ -304,16 +304,12 @@ class NDArray:
             point to the same memory as the original array.
         """
         ### BEGIN YOUR SOLUTION
-        if not all([
-            self.shape[i] == 1
-            or
-            new_shape[i] == self.shape[i]
-            for i in range(len(new_shape))
-        ]):
-            raise ValueError()
+        for i in range(len(self.shape)):
+            if self.shape[i]!=1 and new_shape[i]!=self.shape[i]:
+                raise ValueError()
 
         newStrides = tuple([
-            0 if self.shape[i] == 1 else self._strides[i]
+            0 if i<len(self.shape) and self.shape[i] == 1 else self._strides[i]
             for i in range(len(new_shape))
         ])
         

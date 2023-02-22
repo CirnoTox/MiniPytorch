@@ -60,7 +60,7 @@ def epoch(dataloader: mpt.data.DataLoader,
             i += 1
             forwardRes = model.forward(imgs)
             iLoss, iError = loss_err(forwardRes, labels)
-            loss += iLoss.numpy()
+            loss += iLoss.numpy()[0]
             err += iError
             num_sample += labels.shape[0]
         return (err/num_sample, loss/i)
@@ -76,7 +76,7 @@ def epoch(dataloader: mpt.data.DataLoader,
             i += 1
             forwardRes = model.forward(imgs)
             iLoss, iError = loss_err(forwardRes, labels)
-            loss += iLoss.numpy()
+            loss += iLoss.numpy()[0]
             err += iError
             num_sample += labels.shape[0]
             iLoss.backward()

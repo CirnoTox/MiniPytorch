@@ -97,6 +97,18 @@ class Linear(Module):
             return X@self.weight+self.bias.broadcast_to((X.shape[0], self.out_features))
         else:
             return X@self.weight
+    #     self.weight = Parameter(init.kaiming_uniform(in_features, out_features))
+    #     if bias:
+    #         self.bias = Parameter(init.kaiming_uniform(out_features, 1) )
+    #         self.bias=self.bias.reshape((1, -1))
+
+
+    # def forward(self, X: Tensor) -> Tensor:
+    #     if self.bias is not None:
+    #         biasBroadcastShape = (X.shape[0], self.out_features)
+    #         return X.matmul(self.weight)+self.bias.broadcast_to(biasBroadcastShape)
+    #     else:
+    #         return X.matmul(self.weight)
 
 
 class Flatten(Module):
@@ -125,7 +137,13 @@ class SoftmaxLoss(Module):
     def forward(self, logits: Tensor, y: Tensor):
         oneHot = init.one_hot(logits.shape[1], y)
         logSumExp = ops.logsumexp(logits, axes=1)
-        return ops.summation(logSumExp+(-ops.summation(ops.multiply(logits, oneHot), axes=(1,))), axes=(0,)) / Tensor(oneHot.shape[0], dtype="float32")
+        sumMul = ops.summation(ops.multiply(logits, oneHot), axes=(1,))
+        neg=-sumMul
+        add=logSumExp+neg
+        summa=ops.summation(
+            add, axes=(0,)
+        )
+        return  summa/ Tensor([oneHot.shape[0]])
 
 
 class BatchNorm1d(Module):
@@ -163,8 +181,8 @@ class LayerNorm1d(Module):
         super().__init__()
         self.dim = dim
         self.eps = eps
-        self.weight = Parameter(init.ones(dim))
-        self.bias = Parameter(init.zeros(dim))
+        self.weight = Parameter(init.ones(dim, requires_grad=True).reshape((1, -1)))
+        self.bias = Parameter(init.zeros(dim, requires_grad=True).reshape((1, -1)))
 
     def forward(self, x: Tensor) -> Tensor:
         E = ops.broadcast_to(ops.reshape(ops.summation(
@@ -185,7 +203,7 @@ class Dropout(Module):
     def forward(self, x: Tensor) -> Tensor:
         # https://github.com/bettersemut/dlsys_hw2/blob/8b16e4ecac6cf5d5efb2c4840f9107cdfe64e00b/python/needle/nn.py#L225
         if self.training:
-            mask = init.randb(*x.shape, p=1 - self.p, dtype=x.dtype)
+            mask = init.randb(*x.shape, p=1 - self.p, dtype=x.dtype, requires_grad=True)
             return x * mask / (1 - self.p)
         else:
             return x

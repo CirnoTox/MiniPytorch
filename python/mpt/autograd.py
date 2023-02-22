@@ -93,7 +93,7 @@ class Value:
         self.cached_data = self.op.compute(
             *[x.realize_cached_data() for x in self.inputs]
         )
-        self.cached_data
+        # self.cached_data
         return self.cached_data
 
     def is_leaf(self):
@@ -390,7 +390,8 @@ def compute_gradient_of_variables(output_tensor, out_grad):
         nodeI.grad = sum_node_list(node_to_output_grads_list[nodeI])
         if nodeI.op is None:
             continue
-        for node_j, grad_j in zip(nodeI.inputs, as_tuple(nodeI.op.gradient(nodeI.grad, nodeI))):
+        opgrad=nodeI.op.gradient(nodeI.grad, nodeI)
+        for node_j, grad_j in zip(nodeI.inputs, as_tuple(opgrad)):
             if node_j not in node_to_output_grads_list:
                 node_to_output_grads_list[node_j] = []
             node_to_output_grads_list[node_j].append(grad_j)
