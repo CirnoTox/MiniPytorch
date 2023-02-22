@@ -1,0 +1,3 @@
+/home/arch/Desktop/finalProject/MiniPytorch/build/CMakeFiles/ndarray_backend_cpu.dir
+/home/arch/Desktop/finalProject/MiniPytorch/build/CMakeFiles/edit_cache.dir
+/home/arch/Desktop/finalProject/MiniPytorch/build/CMakeFiles/rebuild_cache.dir
