@@ -97,18 +97,7 @@ class Linear(Module):
             return X@self.weight+self.bias.broadcast_to((X.shape[0], self.out_features))
         else:
             return X@self.weight
-    #     self.weight = Parameter(init.kaiming_uniform(in_features, out_features))
-    #     if bias:
-    #         self.bias = Parameter(init.kaiming_uniform(out_features, 1) )
-    #         self.bias=self.bias.reshape((1, -1))
 
-
-    # def forward(self, X: Tensor) -> Tensor:
-    #     if self.bias is not None:
-    #         biasBroadcastShape = (X.shape[0], self.out_features)
-    #         return X.matmul(self.weight)+self.bias.broadcast_to(biasBroadcastShape)
-    #     else:
-    #         return X.matmul(self.weight)
 
 
 class Flatten(Module):
