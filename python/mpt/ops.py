@@ -286,7 +286,6 @@ class MatMul(TensorOp):
         return a@b
 
     def gradient(self, out_grad, node):
-        # https://github.com/bettersemut/dlsys_hw2/blob/8b16e4ecac6cf5d5efb2c4840f9107cdfe64e00b/python/needle/ops.py#L273
         lhs, rhs = node.inputs
         lhs_grad = out_grad@rhs.transpose()
         rhs_grad = lhs.transpose()@out_grad
