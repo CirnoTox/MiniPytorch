@@ -72,7 +72,6 @@ class TensorTupleOp(Op):
     def __call__(self, *args):
         return TensorTuple.make_from_op(self, args)
 
-
 class Value:
     """A value in the computational graph."""
 
@@ -84,16 +83,20 @@ class Value:
     cached_data: NDArray
     requires_grad: bool
 
-    def realize_cached_data(self):
+    count:int=0
+    def realize_cached_data(self,offset=0):
         """Run compute to realize the cached data"""
         # avoid recomputation
+        self.count+=1+offset
+        # print("\t"*self.count,self.cached_data)
         if self.cached_data is not None:
             return self.cached_data
         # note: data implicitly calls realized cached data
         self.cached_data = self.op.compute(
-            *[x.realize_cached_data() for x in self.inputs]
+            *[x.realize_cached_data(offset=self.count) for x in self.inputs]
         )
-        # self.cached_data
+        # print("\t"*self.count,self.cached_data)
+        self.count-=1-offset
         return self.cached_data
 
     def is_leaf(self):

@@ -65,7 +65,7 @@ class Adam(Optimizer):
         for i, w in enumerate(self.params):
             if w.grad==None:
                 continue
-            loss_data = w.grad.data + weight_decay*w
+            loss_data = w.grad.data + weight_decay*w.data
             if self.m.get(i) is None:
                 self.m[i] = mpt.utility.zeros(*w.shape)
             if self.v.get(i) is None:
@@ -74,4 +74,5 @@ class Adam(Optimizer):
             self.v[i] = beta2*self.v[i]+(1-beta2)*(loss_data**2)
             mt = self.m[i]/(1-beta1**self.t)
             vt = self.v[i]/(1-beta2**self.t)
-            w.data = w.data+(-self.lr*mt/(vt**0.5+self.eps))
+            w.data = w.data+(-self.lr*mt.data/(vt.data**0.5+self.eps))
+            

@@ -439,42 +439,6 @@ namespace mpt
        *   p: columns of b / out
        *
        */
-      /// BEGIN YOUR SOLUTION
-
-      // for (int i = 0; i < 64; i++)
-      // {
-      //   a.ptr[i] = i;
-      //   b.ptr[i] = i;
-      //    out->ptr[i]=0;
-      // }
-      // debugFile << "A:"<<std::endl;
-      // for (int i = 0; i < 8; i++)
-      // {
-      //   for (int j = 0; j < 8; j++)
-      //   {
-      //     debugFile << a.ptr[i * 8 + j] << '\t';
-      //   }
-      //   debugFile << std::endl;
-      // }
-      // debugFile << "B:"<<std::endl;
-      // for (int i = 0; i < 8; i++)
-      // {
-      //   for (int j = 0; j < 8; j++)
-      //   {
-      //     debugFile << b.ptr[i * 8 + j] << '\t';
-      //   }
-      //   debugFile << std::endl;
-      // }
-      // AlignedDot(&(a.ptr[0]), &(b.ptr[0]), &(out->ptr[0]));
-      // debugFile << "Out:"<<std::endl;
-      // for (int i = 0; i < 8; i++)
-      // {
-      //   for (int j = 0; j < 8; j++)
-      //   {
-      //     debugFile << out->ptr[i * 8 + j] << '\t';
-      //   }
-      //   debugFile << std::endl;
-      // }
 
       for (int i = 0; i < out->size; i++)
       {

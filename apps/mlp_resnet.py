@@ -23,7 +23,6 @@ def ResidualBlock(dim, hidden_dim, norm=nn.BatchNorm1d, drop_prob=0.1):
         nn.ReLU()
     )
 
-
 def MLPResNet(dim, hidden_dim=100, num_blocks=3, num_classes=10, norm=nn.BatchNorm1d, drop_prob=0.1):
     ls = [nn.Linear(dim, hidden_dim), nn.ReLU()]
     for _ in range(num_blocks):
@@ -31,7 +30,7 @@ def MLPResNet(dim, hidden_dim=100, num_blocks=3, num_classes=10, norm=nn.BatchNo
             ResidualBlock(hidden_dim, hidden_dim//2,
                           norm, drop_prob)
         )
-    ls.append(nn.Linear(hidden_dim, num_classes))
+    ls.append(nn.Linear(hidden_dim, num_classes)) # 分类层
     return nn.Sequential(*ls)
 
 
