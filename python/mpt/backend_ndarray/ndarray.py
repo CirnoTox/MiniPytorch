@@ -77,6 +77,7 @@ def cpu():
 
 def default_device():
     return cpu_numpy()
+    # return cpu()
 
 
 def all_devices():

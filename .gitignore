@@ -1,3 +1,7 @@
-result/
+data/*
 
-data/
+
+result/MLPResNet_Adam.csv
+result/MLPResNet_SGD.csv
+result/simple_nn_Adam.csv
+result/simple_nn_SGD.csv

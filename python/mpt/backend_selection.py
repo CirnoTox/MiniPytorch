@@ -3,6 +3,7 @@ import os
 
 
 BACKEND = os.environ.get("MPT_BACKEND", "nd")
+BACKEND = "nd"
 
 
 if BACKEND == "nd":
